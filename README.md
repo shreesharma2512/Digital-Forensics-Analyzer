@@ -1,75 +1,27 @@
-# Digital Forensics Analyzer
+# Digital Forensics Analyzer — Vercel + Render
 
-A beginner-friendly Flask application for educational digital evidence triage. Upload a file, inspect basic metadata, calculate MD5 and SHA-256 hashes, view image dimensions/EXIF metadata, and download a PDF summary.
+The project is split into `frontend/` (static HTML/CSS/JS) and `backend/` (Flask REST API).
 
-## Features
-- Evidence upload with extension allowlist and 25 MB limit
-- SQLite evidence register
-- File size, extension, MIME guess and modified timestamp
-- MD5 and SHA-256 hashes
-- Image properties and readable EXIF metadata (when present)
-- Downloadable PDF analysis report
+## Render backend
+Create a Render Web Service from this GitHub repository. Set Root Directory to `backend`, Runtime to Python, Build Command to `pip install -r requirements.txt`, and Start Command to `gunicorn app:app`. Deploy, then test `/api/health` on the Render URL.
 
-## Technology
-Python, Flask, SQLite, Pillow, ReportLab, HTML, Bootstrap 5 and JavaScript.
+## Vercel frontend
+Import the same repository in Vercel. Set Root Directory to `frontend`, Framework Preset to Other, leave Build Command blank, and set Output Directory to `.`. Deploy.
 
-## Requirements
-- Python 3.10 or newer
-- pip
+Edit `frontend/js/config.js` and replace `https://YOUR-RENDER-SERVICE.onrender.com` with the actual Render URL. Commit and push; Vercel redeploys automatically. Set Render environment variable `FRONTEND_ORIGIN` to the exact Vercel URL and redeploy the backend.
 
-## Run on Windows
-Open Command Prompt or the VS Code terminal in this project folder:
+## API
+`GET /api/health`; `GET /api/evidence`; `POST /api/evidence` (multipart fields: `evidence`, optional `case_ref`, `notes`); `GET /api/evidence/<id>`; `GET /api/evidence/<id>/report`.
 
-```bash
+## Local backend (Windows)
+```bat
+cd backend
 python -m venv venv
 venv\Scripts\activate
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 python app.py
 ```
+Backend runs at `http://127.0.0.1:5000`.
 
-Open http://127.0.0.1:5000 in your browser.
-
-## Run on macOS/Linux
-```bash
-python3 -m venv venv
-source venv/bin/activate
-python -m pip install -r requirements.txt
-python app.py
-```
-
-Open http://127.0.0.1:5000 in your browser.
-
-## Project structure
-```text
-app.py                 Flask routes and application startup
-database.py            SQLite database operations
-forensic/hashing.py    MD5 and SHA-256 calculation
-forensic/file_analysis.py Basic file metadata
-forensic/image_analysis.py Image properties and EXIF extraction
-forensic/report.py     PDF report generation
-templates/             HTML pages
-static/                CSS and JavaScript
-uploads/                Uploaded evidence copies (not committed)
-reports/                Generated PDF reports (not committed)
-```
-
-## Important limitations and safe use
-This is an educational prototype, not a certified forensic acquisition suite. MIME type is inferred from the filename, timestamps can be modified, and metadata can be absent or manipulated. A hash demonstrates content equality between copies when recalculated; it does not prove provenance or authenticity. The app does not implement a formal chain-of-custody process, disk imaging, malware scanning, or automated proof of tampering.
-
-Use only files you own or are authorized to examine. For real investigations, use validated forensic procedures, preserve originals read-only, record custody transfers, and have findings reviewed by a qualified examiner. Do not upload confidential or sensitive evidence to an exposed/public server.
-
-## GitHub publishing
-1. Create a new **public** GitHub repository named `Digital-Forensics-Analyzer`.
-2. Do not upload `venv/`, `forensics.db`, or real evidence files from `uploads/`.
-3. From the project folder run:
-
-```bash
-git init
-git add .
-git commit -m "Initial Digital Forensics Analyzer project"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/Digital-Forensics-Analyzer.git
-git push -u origin main
-```
-
-Replace `YOUR-USERNAME` with your GitHub username.
+## Storage and forensic limitations
+This educational version uses SQLite and temporary upload files on the Render filesystem. Render free web-service storage is ephemeral; records can be lost after restarts/redeploys. For durable records use persistent storage or managed PostgreSQL and object storage. This is not a certified forensic acquisition tool. Hashes support content comparison but do not prove provenance. Use authorized sample files and keep chain-of-custody records separately.

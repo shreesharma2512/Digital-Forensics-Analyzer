@@ -1,10 +1,5 @@
-venv/
 __pycache__/
 *.py[cod]
+venv/
 .env
-forensics.db
-uploads/*
-!uploads/.gitkeep
-reports/*
-!reports/.gitkeep
-.DS_Store
+backend/data/
